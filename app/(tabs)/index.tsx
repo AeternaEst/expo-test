@@ -1,107 +1,37 @@
-import { useEffect } from "react";
+import React from "react";
 import {
-  Alert,
-  Dimensions,
-  Pressable,
-  ScrollView,
-  Text,
-  TouchableOpacity,
   View,
 } from "react-native";
-import Animated, {
-  Easing,
-  useAnimatedProps,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from "react-native-reanimated";
+import {
+  ResizeMode,
+  Video
+} from "expo-av";
+
+const WORKS_ON_IOS_AND_ANDROID = "https://dl.dropbox.com/scl/fi/2jlkb2lbi5rmkuthhxkq7/big_buck_bunny.mp4?rlkey=ym7izlz30nf8x5nprfbaxb2ym&st=u9qf49kp&dl=1";
+const ONLY_WORKS_ON_ANDROID_1 = "https://www.dropbox.com/scl/fi/n8ibuy40pjqsuzhqc6xxy/Clipchamp.mp4?rlkey=oe2c71w77cmes77q9wb5amiu5&st=ckvwx9w7&dl=1";
+const ONLY_WORKS_ON_ANDROID_2 = "https://www.dropbox.com/scl/fi/38llzdxwk2y90jyyj9knw/Youtube.mp4?rlkey=f5875yaczl7qjb53j4k31r06s&st=fcghxqdd&dl=1"
 
 export default function HomeScreen() {
-  const windowWidth = Dimensions.get("window").width;
-
-  const getOffsetXEndPosition = () => {
-    return 1100 - windowWidth;
-  };
-
-  const offsetX = useSharedValue<number>(0);
-
-  const animatedProps = useAnimatedProps(() => ({
-    contentOffset: {
-      x: offsetX.value,
-      y: 0,
-    },
-  }));
-
-  useEffect(() => {
-    console.log("Starting slider animation");
-    offsetX.value = withRepeat(
-      withTiming(getOffsetXEndPosition(), {
-        duration: 2500,
-        easing: Easing.linear,
-      }),
-      -1,
-      true
-    );
-  }, []);
-
-  const generateBoxes = (): React.ReactElement[] => {
-    return Array.apply(null, Array(10)).map((_, index) => (
-      <View
-        key={index}
-        style={{
-          backgroundColor: "blue",
-          width: 100,
-          height: 100,
-          marginRight: 10,
-        }}
-      />
-    ));
-  };
+  const video = React.useRef<Video>(null);
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Remove this outer scrollview to make the touchables work on IOS */}
-      <ScrollView
-        contentContainerStyle={{ flex: 1 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Animated.ScrollView
-          onContentSizeChange={(width, height) => {
-            console.log(width, height);
-          }}
-          horizontal
-          contentContainerStyle={{ alignSelf: "center" }}
-          animatedProps={animatedProps}
-          showsHorizontalScrollIndicator={false}
-        >
-          {generateBoxes()}
-        </Animated.ScrollView>
-
-        <Pressable
-          style={{
-            backgroundColor: "green",
-            width: "100%",
-            height: 50,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          onPress={() => Alert.alert("Click")}
-        >
-          <Text>Alert</Text>
-        </Pressable>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "red",
-            width: "100%",
-            height: 50,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          onPress={() => Alert.alert("Click")}
-        >
-          <Text>Alert</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      <Video
+        ref={video}
+        style={{
+          alignSelf: "center",
+          width: "100%",
+          maxWidth: 800,
+          height: 200
+        }}
+        source={{
+          uri: ONLY_WORKS_ON_ANDROID_1
+        }}
+        useNativeControls
+        resizeMode={ResizeMode.COVER}
+        onError={(error) => console.log("Error during video playback", error)}
+        
+      />
     </View>
   );
 }
